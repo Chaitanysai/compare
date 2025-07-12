@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Treadmill Comparison: Lifelong LLTM154 vs. MAXPRO PTM405M</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Neutrals -->
+    <!-- Application Structure Plan: A user-centric, interactive dashboard design. The structure guides the user from a high-level, persona-based recommendation to detailed comparisons, allowing them to explore data at their own pace. The flow is: 1. Quick Verdict (Persona Selector) -> 2. At-a-Glance Visual Comparison (Radar Chart) -> 3. Side-by-Side Key Differentiators (Bar Chart & Cards) -> 4. Deep Dive (Tabbed Content) -> 5. Final Recommendation. This structure prioritizes user decision-making by answering the main question ("Which is for me?") upfront, then providing layered, interactive evidence to support that conclusion, which is more effective than a linear report. -->
+    <!-- Visualization & Content Choices: 1. **User Persona Selector (Buttons/JS)**: To immediately engage and personalize the experience. 2. **Radar Chart (Chart.js)**: To provide a holistic, multi-point visual summary for at-a-glance comparison. 3. **Horizontal Bar Chart (Chart.js)**: To dramatically highlight the most critical performance difference (Continuous Use Time). 4. **Styled Cards (HTML/Tailwind)**: For clean, scannable presentation of core specs. 5. **Tabbed Interface (JS)**: To organize detailed information (Features, Ownership) without overwhelming the user, promoting exploration. 6. **Icon-based Pro/Con Lists (HTML/Unicode)**: For rapid synthesis of qualitative user feedback. This mix of interactive and static visual elements is chosen to translate the report's dense text into a clear, engaging, and digestible decision-making tool. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chart-container { position: relative; width: 100%; max-width: 500px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 400px; } }
+        .tab-button.active { border-color: #3B82F6; color: #3B82F6; font-weight: 600; }
+        .highlight-lifelong { transition: all 0.3s ease-in-out; border: 2px solid #3B82F6; box-shadow: 0 10px 15px -3px rgb(59 130 246 / 0.2), 0 4px 6px -4px rgb(59 130 246 / 0.2); }
+        .highlight-maxpro { transition: all 0.3s ease-in-out; border: 2px solid #10B981; box-shadow: 0 10px 15px -3px rgb(16 185 129 / 0.2), 0 4px 6px -4px rgb(16 185 129 / 0.2); }
+        .transition-slow { transition: all 0.5s ease-in-out; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-2">Treadmill Head-to-Head</h1>
+            <p class="text-lg text-gray-600">Lifelong LLTM154 vs. MAXPRO PTM405M</p>
+        </header>
+
+        <section id="persona" class="mb-12 bg-white p-6 rounded-xl shadow-sm">
+            <h2 class="text-2xl font-bold text-center mb-4">Which Treadmill Fits Your Style?</h2>
+            <p class="text-center text-gray-600 mb-6 max-w-2xl mx-auto">This interactive tool helps you decide based on the detailed comparison report. Start by selecting the profile that best describes you to see our initial recommendation and highlight relevant features across the page.</p>
+            <div class="flex flex-col md:flex-row justify-center gap-4">
+                <button id="runner-btn" class="persona-btn flex-1 p-4 border-2 border-gray-300 rounded-lg text-left hover:border-blue-500 transition-slow">
+                    <h3 class="font-bold text-lg text-gray-800">🏃 The Dedicated Runner</h3>
+                    <p class="text-gray-600">I need a durable, quiet machine for long, daily workouts. Performance and reliability are my top priorities.</p>
+                </button>
+                <button id="seeker-btn" class="persona-btn flex-1 p-4 border-2 border-gray-300 rounded-lg text-left hover:border-green-500 transition-slow">
+                    <h3 class="font-bold text-lg text-gray-800">🏋️ The All-in-One Fitness Seeker</h3>
+                    <p class="text-gray-600">I want a versatile station for cardio, core, and light strength training. A solid warranty and extra features are important.</p>
+                </button>
+            </div>
+            <div id="persona-verdict" class="mt-6 p-4 rounded-lg bg-gray-100 text-center hidden">
+                <p class="text-gray-800 font-semibold"></p>
+            </div>
+        </section>
+
+        <main class="space-y-12">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <section id="lifelong-card" class="bg-white p-6 rounded-xl shadow-sm border-2 border-transparent">
+                    <h3 class="text-2xl font-bold mb-4 text-center">Lifelong LLTM154 Fit Pro</h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li><span class="font-semibold">Motor:</span> 4.5 HP Peak</li>
+                        <li><span class="font-semibold">Max Speed:</span> 14 km/hr</li>
+                        <li><span class="font-semibold">Max Weight:</span> 110 kg</li>
+                        <li><span class="font-semibold">Key Feature:</span> Proven durability for long sessions</li>
+                        <li><span class="font-semibold">Warranty:</span> 1 Year Standard</li>
+                    </ul>
+                </section>
+                <section id="maxpro-card" class="bg-white p-6 rounded-xl shadow-sm border-2 border-transparent">
+                    <h3 class="text-2xl font-bold mb-4 text-center">MAXPRO PTM405M</h3>
+                     <ul class="space-y-2 text-gray-700">
+                        <li><span class="font-semibold">Motor:</span> 4.5 HP Peak (2 HP Continuous)</li>
+                        <li><span class="font-semibold">Max Speed:</span> 14 km/hr</li>
+                        <li><span class="font-semibold">Max Weight:</span> 110 kg (95kg suggested for running)</li>
+                        <li><span class="font-semibold">Key Feature:</span> Multi-functional (Dumbbells, Sit-up)</li>
+                        <li><span class="font-semibold">Warranty:</span> Lifetime Frame Warranty</li>
+                    </ul>
+                </section>
+            </div>
+
+            <section class="bg-white p-6 rounded-xl shadow-sm">
+                 <h2 class="text-2xl font-bold text-center mb-4">Performance at a Glance</h2>
+                 <p class="text-center text-gray-600 mb-6 max-w-2xl mx-auto">This radar chart provides a holistic view of how the two treadmills stack up across key decision-making factors. Higher scores indicate better performance in that category.</p>
+                <div class="chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </section>
+
+            <section class="bg-white p-6 rounded-xl shadow-sm">
+                <h2 class="text-2xl font-bold text-center mb-4">Key Differentiator: Workout Endurance</h2>
+                <p class="text-center text-gray-600 mb-6 max-w-2xl mx-auto">One of the most significant differences is the manufacturer's recommended continuous usage time. This directly impacts how suitable each machine is for long, uninterrupted fitness sessions.</p>
+                <div class="chart-container h-48 md:h-64">
+                    <canvas id="barChart"></canvas>
+                </div>
+            </section>
+
+            <section class="bg-white p-6 rounded-xl shadow-sm">
+                <h2 class="text-2xl font-bold text-center mb-4">Detailed Deep Dive</h2>
+                <p class="text-center text-gray-600 mb-6 max-w-2xl mx-auto">Explore the specific details of each treadmill. Use the tabs below to switch between different aspects of the comparison, from core performance to long-term ownership experience.</p>
+                <div class="border-b border-gray-200">
+                    <nav class="-mb-px flex space-x-6 justify-center" aria-label="Tabs">
+                        <button class="tab-button active" data-tab="performance">Performance & Durability</button>
+                        <button class="tab-button" data-tab="features">Features & Convenience</button>
+                        <button class="tab-button" data-tab="ownership">Ownership Experience</button>
+                    </nav>
+                </div>
+
+                <div id="tab-content" class="mt-6">
+                    <div id="performance-content" class="tab-pane">
+                         <div class="grid md:grid-cols-2 gap-6">
+                            <div class="p-4 bg-gray-50 rounded-lg">
+                                <h4 class="font-bold text-lg mb-2 text-blue-600">Lifelong LLTM154</h4>
+                                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                    <li><b>Motor:</b> Robust design allowing 2 hours of continuous use.</li>
+                                    <li><b>Stabilizer:</b> Not required, simplifying setup and cost.</li>
+                                    <li><b>Durability:</b> User-proven phenomenal durability under heavy, prolonged use.</li>
+                                    <li><b>Noise:</b> Consistently reported as "surprisingly quiet".</li>
+                                    <li><b>Weight Capacity:</b> Reliable at the advertised 110 kg limit.</li>
+                                </ul>
+                            </div>
+                            <div class="p-4 bg-gray-50 rounded-lg">
+                                <h4 class="font-bold text-lg mb-2 text-green-600">MAXPRO PTM405M</h4>
+                                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                    <li><b>Motor:</b> 45-minute recommended continuous use, requires breaks.</li>
+                                    <li><b>Stabilizer:</b> 4Kva stabilizer suggested, adding an extra cost.</li>
+                                    <li><b>Durability:</b> "Robust build" but some concerns over plastic and belt material quality.</li>
+                                    <li><b>Noise:</b> Mixed feedback; can be quiet but some report sluggishness and noise.</li>
+                                    <li><b class="text-amber-600">Weight Capacity:</b> Advertised at 110 kg, but support suggests optimal use for runners up to 95 kg.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="features-content" class="tab-pane hidden">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="p-4 bg-gray-50 rounded-lg">
+                                <h4 class="font-bold text-lg mb-2 text-blue-600">Lifelong LLTM154</h4>
+                                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                    <li><b>Display:</b> Standard LCD Display.</li>
+                                    <li><b>Add-ons:</b> Includes a built-in massager.</li>
+                                    <li><b>Connectivity:</b> MP3 via Bluetooth.</li>
+                                    <li><b>Folding:</b> Standard foldable design.</li>
+                                    <li><b>Cushioning:</b> Good shock absorption reported by users.</li>
+                                </ul>
+                            </div>
+                            <div class="p-4 bg-gray-50 rounded-lg">
+                                <h4 class="font-bold text-lg mb-2 text-green-600">MAXPRO PTM405M</h4>
+                                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                    <li><b>Display:</b> Brighter 5-inch Blue LED Display.</li>
+                                    <li><b>Add-ons:</b> More versatile with massager, sit-up bar, and 2x1kg dumbbells.</li>
+                                    <li><b>Connectivity:</b> Speakers with AUX/USB (but user-rated as "horrible").</li>
+                                    <li><b>Folding:</b> Superior soft drop hydraulic system for easier folding.</li>
+                                    <li><b>Cushioning:</b> Advanced "Comfort Cell" system and multi-layered belt.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="ownership-content" class="tab-pane hidden">
+                         <div class="grid md:grid-cols-2 gap-6">
+                            <div class="p-4 bg-gray-50 rounded-lg">
+                                <h4 class="font-bold text-lg mb-2 text-blue-600">Lifelong LLTM154</h4>
+                                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                    <li><b>Warranty:</b> Standard 1-year product warranty.</li>
+                                    <li><b>Installation:</b> Self-installation with call assistance available.</li>
+                                    <li><b>Maintenance:</b> Requires regular oiling; straightforward process.</li>
+                                    <li><b>Known Issues:</b> Controller/remote can be faulty, but customer service provides free replacements.</li>
+                                </ul>
+                            </div>
+                            <div class="p-4 bg-gray-50 rounded-lg">
+                                <h4 class="font-bold text-lg mb-2 text-green-600">MAXPRO PTM405M</h4>
+                                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                    <li><b class="text-green-700">Warranty:</b> Superior Lifetime Frame Warranty + 1 year on motor/parts.</li>
+                                    <li><b>Installation:</b> Easier setup as it arrives 90% pre-installed.</li>
+                                    <li><b>Maintenance:</b> Lubrication process can be challenging ("a nightmare" for one user).</li>
+                                    <li><b>Known Issues:</b> Ineffective speakers, inconsistent noise levels.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="final-verdict" class="bg-white p-6 rounded-xl shadow-sm hidden">
+                <h2 class="text-2xl font-bold text-center mb-4">Final Recommendation</h2>
+                <div id="verdict-runner" class="hidden text-center p-4">
+                     <h3 class="font-bold text-xl mb-2 text-blue-600">Choose the Lifelong LLTM154 Fit Pro</h3>
+                     <p class="text-gray-700 max-w-2xl mx-auto">Its proven durability under heavy use, longer continuous run time, and quiet operation make it the ideal choice for serious fitness enthusiasts who prioritize core performance and reliability for long, daily workouts.</p>
+                </div>
+                 <div id="verdict-seeker" class="hidden text-center p-4">
+                     <h3 class="font-bold text-xl mb-2 text-green-600">Choose the MAXPRO PTM405M</h3>
+                     <p class="text-gray-700 max-w-2xl mx-auto">Its versatile features like dumbbells and a sit-up bar, combined with a superior lifetime frame warranty, make it a great value for those seeking a multi-functional home gym. It's best for casual users with shorter workout sessions.</p>
+                </div>
+            </section>
+        </main>
+        
+        <footer class="text-center mt-12 pt-8 border-t border-gray-200">
+            <p class="text-gray-500 text-sm">This is an interactive summary based on a detailed comparative analysis report. All data is derived from publicly available specifications and user feedback. Always verify details before purchasing.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const treadmillData = {
+                lifelong: {
+                    name: 'Lifelong LLTM154',
+                    scores: {
+                        durability: 9,
+                        features: 6,
+                        warranty: 5,
+                        performance: 8,
+                        ownershipCost: 8 
+                    },
+                    continuousUse: 120,
+                    color: 'rgba(59, 130, 246, 0.8)'
+                },
+                maxpro: {
+                    name: 'MAXPRO PTM405M',
+                    scores: {
+                        durability: 7,
+                        features: 8,
+                        warranty: 9,
+                        performance: 6,
+                        ownershipCost: 6
+                    },
+                    continuousUse: 45,
+                    color: 'rgba(16, 185, 129, 0.8)'
+                }
+            };
+
+            const radarCtx = document.getElementById('radarChart').getContext('2d');
+            const barCtx = document.getElementById('barChart').getContext('2d');
+
+            const radarChart = new Chart(radarCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Durability', 'Extra Features', 'Warranty', 'Performance', 'Low Ownership Cost'],
+                    datasets: [{
+                        label: treadmillData.lifelong.name,
+                        data: Object.values(treadmillData.lifelong.scores),
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(59, 130, 246, 1)'
+                    }, {
+                        label: treadmillData.maxpro.name,
+                        data: Object.values(treadmillData.maxpro.scores),
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                        borderColor: 'rgba(16, 185, 129, 1)',
+                        pointBackgroundColor: 'rgba(16, 185, 129, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(16, 185, 129, 1)'
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { display: true },
+                            suggestedMin: 0,
+                            suggestedMax: 10,
+                            pointLabels: { font: { size: 12 } }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const barChart = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: [treadmillData.lifelong.name, treadmillData.maxpro.name],
+                    datasets: [{
+                        label: 'Recommended Continuous Use (Minutes)',
+                        data: [treadmillData.lifelong.continuousUse, treadmillData.maxpro.continuousUse],
+                        backgroundColor: [treadmillData.lifelong.color, treadmillData.maxpro.color],
+                        borderColor: [
+                            'rgba(59, 130, 246, 1)',
+                            'rgba(16, 185, 129, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Minutes' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            const personaButtons = document.querySelectorAll('.persona-btn');
+            const personaVerdict = document.getElementById('persona-verdict');
+            const lifelongCard = document.getElementById('lifelong-card');
+            const maxproCard = document.getElementById('maxpro-card');
+            const finalVerdictSection = document.getElementById('final-verdict');
+            const verdictRunner = document.getElementById('verdict-runner');
+            const verdictSeeker = document.getElementById('verdict-seeker');
+
+            personaButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    personaButtons.forEach(btn => btn.classList.remove('highlight-lifelong', 'highlight-maxpro'));
+                    lifelongCard.classList.remove('highlight-lifelong');
+                    maxproCard.classList.remove('highlight-maxpro');
+                    finalVerdictSection.classList.remove('hidden');
+                    verdictRunner.classList.add('hidden');
+                    verdictSeeker.classList.add('hidden');
+
+                    if (this.id === 'runner-btn') {
+                        this.classList.add('highlight-lifelong');
+                        lifelongCard.classList.add('highlight-lifelong');
+                        personaVerdict.querySelector('p').textContent = 'Recommendation: The Lifelong LLTM154 aligns best with your needs for durability and performance.';
+                        verdictRunner.classList.remove('hidden');
+                    } else {
+                        this.classList.add('highlight-maxpro');
+                        maxproCard.classList.add('highlight-maxpro');
+                        personaVerdict.querySelector('p').textContent = 'Recommendation: The MAXPRO PTM405M is a great fit for its versatility and feature set.';
+                        verdictSeeker.classList.remove('hidden');
+                    }
+                    personaVerdict.classList.remove('hidden');
+                    finalVerdictSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                });
+            });
+            
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+
+                    tabPanes.forEach(pane => {
+                        pane.classList.add('hidden');
+                    });
+                    
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId + '-content').classList.remove('hidden');
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
